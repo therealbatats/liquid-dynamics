@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+presentation/slide-*.jpg
+presentation/liquid_dynamics_pitch.pdf
