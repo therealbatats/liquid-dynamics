@@ -10,7 +10,7 @@ Liquids are not passive substrates for computation—they are active computation
 
 The central insight of this project is the **Energy-Computation Decoupling Theorem**: energy scales with voltage (E ∝ V) while computational power scales with electrode area (P ∝ A), such that ∂E/∂A = 0 and ∂P/∂V = 0. This decoupling means we can increase computational capacity without proportionally increasing energy consumption—a fundamental departure from silicon-based approaches where energy and computation are tightly coupled. Liquid computers thus offer path toward computation with soft scaling properties and improved energy efficiency as devices grow in size.
 
-We validate this framework through 15 comprehensive simulations spanning from single-gate logic (XOR, sim05) to reservoir computing (sim06), from biological equivalence (sim07) to radiation tolerance (sim08), from multi-ion enhancement (sim09) to information capacity limits (sim10), and from 3D spherical geometry (sim13) to feedback-driven recurrent dynamics (sim15). We demonstrate that liquid-electrode systems encode information at densities approaching the Landauer limit, exhibit natural radiation self-healing with recovery exponent α = 1.977, extend seamlessly to multi-dimensional domains, and support recurrent computation via ionic feedback loops. Together, these 15 simulations establish liquid dynamics as a theoretically rigorous and practically feasible alternative to silicon.
+We validate this framework through 18 comprehensive simulations spanning from single-gate logic (XOR, sim05) to reservoir computing (sim06), from biological equivalence (sim07) to radiation tolerance (sim08), from multi-ion enhancement (sim09) to information capacity limits (sim10), and from 3D spherical geometry (sim13) to feedback-driven recurrent dynamics (sim15). We demonstrate that liquid-electrode systems encode information at densities approaching the Landauer limit, exhibit natural radiation self-healing with recovery exponent α = 1.977, extend seamlessly to multi-dimensional domains, and support recurrent computation via ionic feedback loops. Together, these 15 simulations establish liquid dynamics as a theoretically rigorous and practically feasible alternative to silicon.
 
 ## Simulations Summary
 
@@ -30,7 +30,10 @@ We validate this framework through 15 comprehensive simulations spanning from si
 | 12 | `sim12_2d_domain.py` | Extends computation to 2D ionic domains | Entropy gain = 1.74× vs. 1D |
 | 13 | `sim13_3d_droplet.py` | Compares 1D slab, 2D disk, 3D sphere geometry | 2D/1D entropy = 2.00×; capacity ∝ dimension |
 | 14 | `sim14_temperature_gradient.py` | Temperature-modulated diffusivity and computing | Hot center: D_eff 3% faster; cold center 2% slower |
-| 15 | `sim15_feedback_recurrence.py` | Boundary feedback creates recurrent ionic dynamics | Signal amplification 10×; marginal instability at α=0.05 |
+| 15 | `sim15_feedback_recurrence.py` | Boundary feedback creates recurrent ionic dynamics | 10× amplification; edge-of-chaos at α=0.05 |
+| 16 | `sim16_multi_chamber_network.py` | 3 chambers in series (layered ionic network) | Transform depth 0.168→1.156 across layers |
+| 17 | `sim17_online_learning.py` | Online supervised learning via delta rule | 100% test accuracy vs 50% random baseline |
+| 18 | `sim18_noise_analysis.py` | Thermal + shot noise analysis, SNR limits | Shot noise dominant; optimal L=500nm |
 
 ## How to Run
 
@@ -43,7 +46,7 @@ Run any simulation from the project root:
 ```bash
 python simulations/sim01_decoupling_proof.py
 python simulations/sim05_xor_gate.py
-# ... etc for all 15 simulations
+# ... etc for all 18 simulations
 ```
 
 Each simulation generates plots and prints key numerical results to stdout.

@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Dynamics - Computing with Ions at the Liquid-Electrode Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* NAVBAR */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #30363d;
+            padding: 1rem 2rem;
+        }
+
+        nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #58A6FF 0%, #D2A8FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #c9d1d9;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #58A6FF;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #58A6FF, transparent);
+        }
+
+        .nav-github-btn {
+            padding: 0.6rem 1.2rem;
+            background: rgba(88, 166, 255, 0.15);
+            border: 1px solid #58A6FF;
+            color: #58A6FF;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-github-btn:hover {
+            background: #58A6FF;
+            color: #0d1117;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0.8rem 1rem;
+            }
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.85rem;
+            }
+            .nav-github-btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* HERO SECTION */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(88, 166, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(210, 168, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #58A6FF;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateY(-30px) translateX(20px);
+                opacity: 0.1;
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        .hero .subheadline {
+            font-size: 1.4rem;
+            color: #8b949e;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .hero .tagline {
+            font-size: 1rem;
+            color: #58A6FF;
+            font-style: italic;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .hero .author {
+            font-size: 0.95rem;
+            color: #7EE787;
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 1rem 2.5rem;
+            border: 2px solid;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cta-btn.primary {
+            background: linear-gradient(135deg, #58A6FF 0%, #7EE787 100%);
+            color: #0d1117;
+            border-color: #58A6FF;
+            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.3);
+        }
+
+        .cta-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(88, 166, 255, 0.4);
+        }
+
+        .cta-btn.secondary {
+            background: transparent;
+            color: #58A6FF;
+            border-color: #58A6FF;
+        }
+
+        .cta-btn.secondary:hover {
+            background: rgba(88, 166, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero .subheadline {
+                font-size: 1.1rem;
+            }
+            .hero-cta {
+                gap: 1rem;
+            }
+            .cta-btn {
+                padding: 0.8rem 1.8rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* SECTIONS */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 2.5rem;
+            color: #ffffff;
+            margin-bottom: 3rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        section h3 {
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        /* OVERVIEW SECTION */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            border-color: #58A6FF;
+            background: rgba(22, 27, 34, 0.8);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(88, 166, 255, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: #8b949e;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* FRAMEWORK SECTION */
+        .equation-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .equation-block:hover {
+            border-color: #F0883E;
+            background: rgba(240, 136, 62, 0.05);
+        }
+
+        .equation {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            color: #F0883E;
+            overflow-x: auto;
+            padding: 1rem 0;
+            line-height: 1.8;
+        }
+
+        .equation-title {
+            font-size: 1rem;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .equation-description {
+            color: #8b949e;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+
+        /* SIMULATIONS SECTION */
+        .simulations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .sim-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sim-card:hover {
+            border-color: #D2A8FF;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(210, 168, 255, 0.15);
+        }
+
+        .sim-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #58A6FF, #7EE787);
+            color: #0d1117;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .sim-title {
+            font-size: 1.1rem;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .sim-result {
+            font-size: 1rem;
+            color: #F0883E;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* KEY RESULTS SECTION */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.15), rgba(210, 168, 255, 0.15));
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #58A6FF;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(88, 166, 255, 0.2);
+        }
+
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #58A6FF, #7EE787);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 1rem;
+            color: #8b949e;
+            font-weight: 500;
+        }
+
+        /* DEVICE SECTION */
+        .device-content {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 2.5rem;
+            line-height: 1.8;
+            margin-top: 2rem;
+        }
+
+        .device-content p {
+            color: #c9d1d9;
+            margin-bottom: 1.5rem;
+        }
+
+        .device-specs {
+            font-family: 'JetBrains Mono', monospace;
+            color: #7EE787;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .device-link {
+            color: #58A6FF;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .device-link:hover {
+            color: #D2A8FF;
+            text-decoration: underline;
+        }
+
+        /* PAPER SECTION */
+        .paper-content {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .paper-title {
+            font-size: 1.4rem;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .paper-content p {
+            color: #8b949e;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .paper-abstract {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 3px solid #58A6FF;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .paper-abstract p {
+            color: #c9d1d9;
+            margin: 0;
+        }
+
+        .paper-status {
+            display: inline-block;
+            background: rgba(240, 136, 62, 0.15);
+            color: #F0883E;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+        }
+
+        .paper-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.8rem;
+            background: #58A6FF;
+            color: #0d1117;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .paper-link:hover {
+            background: #7EE787;
+            transform: translateY(-2px);
+        }
+
+        /* FOOTER */
+        footer {
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: #8b949e;
+            margin-top: 5rem;
+        }
+
+        footer p {
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        footer a {
+            color: #58A6FF;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #D2A8FF;
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 3rem 1rem;
+            }
+
+            section h2 {
+                font-size: 2rem;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .simulations-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            @supports (grid-template-columns: repeat(auto-fit, minmax(0, 1fr))) {
+                .metrics-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                }
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-links {
+                display: none;
+            }
+
+            .simulations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            section h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav>
+        <nav-container>
+            <div class="nav-logo">◇ Liquid Dynamics</div>
+            <ul class="nav-links">
+                <li><a href="#overview" class="nav-link">Overview</a></li>
+                <li><a href="#framework" class="nav-link">Framework</a></li>
+                <li><a href="#simulations" class="nav-link">Simulations</a></li>
+                <li><a href="#results" class="nav-link">Results</a></li>
+                <li><a href="#device" class="nav-link">Device</a></li>
+                <li><a href="#paper" class="nav-link">Paper</a></li>
+            </ul>
+            <a href="https://github.com/therealbatats/liquid-dynamics" class="nav-github-btn" target="_blank">View on GitHub →</a>
+        </nav-container>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-particles" id="particles"></div>
+        <div class="hero-content">
+            <h1>Liquids as Active Computational Media</h1>
+            <p class="subheadline">A unified framework for computing with ions at the liquid-electrode interface</p>
+            <p class="tagline">"Silicon orchestrates. Liquids execute."</p>
+            <p class="author">Ali Ahmed — Independent Researcher</p>
+            <div class="hero-cta">
+                <a href="paper/liquid_dynamics_paper.pdf" class="cta-btn primary">Read the Paper</a>
+                <a href="https://github.com/therealbatats/liquid-dynamics" class="cta-btn secondary" target="_blank">View on GitHub →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- OVERVIEW SECTION -->
+    <section id="overview">
+        <h2>What is Liquid Dynamics?</h2>
+        <div class="overview-grid">
+            <div class="card">
+                <h3 class="card-title">The Insight</h3>
+                <p class="card-content">Liquids are not passive substrates. Ionic concentration gradients governed by the Nernst-Planck equations perform nonlinear transformations on signals.</p>
+            </div>
+            <div class="card">
+                <h3 class="card-title">The Theorem</h3>
+                <p class="card-content"><strong>Energy-Computation Decoupling:</strong> ∂E/∂A = 0, ∂P/∂V = 0. Increasing computational power costs no additional energy.</p>
+            </div>
+            <div class="card">
+                <h3 class="card-title">The Proof</h3>
+                <p class="card-content">18 simulations from XOR gates to online learning, validating every prediction.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FRAMEWORK SECTION -->
+    <section id="framework">
+        <h2>The Physics</h2>
+
+        <div class="equation-block">
+            <div class="equation-title">Nernst-Planck Equation</div>
+            <div class="equation">J_i = −D_i∇c_i − (z_i·F·D_i / R·T)·c_i·∇φ</div>
+            <div class="equation-description">
+                Governs ionic flux through the electrolyte. The first term represents diffusion, the second represents electromigration under the potential gradient. This coupled system enables ion-mediated signal transformation.
+            </div>
+        </div>
+
+        <div class="equation-block">
+            <div class="equation-title">Continuity Equation</div>
+            <div class="equation">∂c_i/∂t + ∇·J_i = 0</div>
+            <div class="equation-description">
+                Enforces conservation of ionic mass. As ions drift and diffuse, their concentration changes dynamically, creating the temporal dynamics essential for computation.
+            </div>
+        </div>
+
+        <div class="equation-block">
+            <div class="equation-title">Poisson Equation</div>
+            <div class="equation">∇²φ = −(F/ε₀εᵣ)·Σ z_i·c_i</div>
+            <div class="equation-description">
+                Couples the potential field to charge distribution. The local potential determines electromigration rates, creating feedback loops that enable nonlinear transformations of input signals.
+            </div>
+        </div>
+    </section>
+
+    <!-- SIMULATIONS SECTION -->
+    <section id="simulations">
+        <h2>18 Simulations. 18 Confirmations.</h2>
+        <div class="simulations-grid">
+            <div class="sim-card">
+                <div class="sim-number">01</div>
+                <div class="sim-title">Energy Decoupling</div>
+                <div class="sim-result">r = −0.030</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">02</div>
+                <div class="sim-title">Signal Processing</div>
+                <div class="sim-result">SI = 1246</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">03</div>
+                <div class="sim-title">Memory Timescale</div>
+                <div class="sim-result">exp = 2.000</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">04</div>
+                <div class="sim-title">Energy Scaling</div>
+                <div class="sim-result">∂E/∂A = 0</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">05</div>
+                <div class="sim-title">XOR Gate</div>
+                <div class="sim-result">100% accuracy</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">06</div>
+                <div class="sim-title">Reservoir Computing</div>
+                <div class="sim-result">87% temporal</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">07</div>
+                <div class="sim-title">Biological Equiv.</div>
+                <div class="sim-result">Same equations</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">08</div>
+                <div class="sim-title">Radiation Healing</div>
+                <div class="sim-result">α = 1.977</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">09</div>
+                <div class="sim-title">Multi-Ion Enhance</div>
+                <div class="sim-result">50% → 70%</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">10</div>
+                <div class="sim-title">Info Capacity</div>
+                <div class="sim-result">13.3 Mb/s</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">11</div>
+                <div class="sim-title">Optimal Readout</div>
+                <div class="sim-result">t* = L²/π²D</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">12</div>
+                <div class="sim-title">2D Domain</div>
+                <div class="sim-result">1.74× entropy</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">13</div>
+                <div class="sim-title">3D Droplet</div>
+                <div class="sim-result">2.00× azimuth</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">14</div>
+                <div class="sim-title">Temp Gradient</div>
+                <div class="sim-result">D(x) coupling</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">15</div>
+                <div class="sim-title">Feedback & Loop</div>
+                <div class="sim-result">10× amplify</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">16</div>
+                <div class="sim-title">Multi-Chamber Net</div>
+                <div class="sim-result">depth: 1.156</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">17</div>
+                <div class="sim-title">Online Learning</div>
+                <div class="sim-result">100% accuracy</div>
+            </div>
+            <div class="sim-card">
+                <div class="sim-number">18</div>
+                <div class="sim-title">Noise Analysis</div>
+                <div class="sim-result">SNR optimal</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- KEY RESULTS SECTION -->
+    <section id="results">
+        <h2>Key Results</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">18</div>
+                <div class="metric-label">Validated Predictions</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">XOR Gate Accuracy</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">13.3</div>
+                <div class="metric-label">Mb/s Info Capacity</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">1.977</div>
+                <div class="metric-label">Radiation Recovery</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEVICE SECTION -->
+    <section id="device">
+        <h2>The Physical Device</h2>
+        <div class="device-content">
+            <p>The Liquid Dynamics prototype is a compact $173 hardware system demonstrating ionic computation in real-world conditions. The device integrates a peristaltic pump for fluid control, dual Ag/AgCl electrodes for electrochemical signaling, and an Arduino-based PID controller for precise temperature and ionic concentration management.</p>
+            <div class="device-specs">
+                • Peristaltic Pump: 0.1 − 10 mL/min variable flow<br>
+                • Electrodes: Ag/AgCl with teflon-insulation<br>
+                • Control: Arduino Uno + custom firmware (PID loop 100 Hz)<br>
+                • Chamber: 2 mL polycarbonate with optical readout ports<br>
+                • Power: 5V USB, <100 mA draw
+            </div>
+            <p>Complete device design documentation, CAD files, and firmware are available in the <a href="device_design.md" class="device-link">Device Design</a> repository.</p>
+        </div>
+    </section>
+
+    <!-- PAPER SECTION -->
+    <section id="paper">
+        <h2>Research Paper</h2>
+        <div class="paper-content">
+            <div class="paper-title">Liquids as Active Computational Media: A Unified Framework for Computing with Ions at the Liquid-Electrode Interface</div>
+            <div class="paper-abstract">
+                <p><strong>Abstract (Opening):</strong> We present a complete theoretical and experimental framework for performing computation using ionic concentration gradients in electrolyte solutions. By leveraging the Nernst-Planck equations governing ion transport, we demonstrate that a liquid-electrode system can execute arbitrary logic operations, perform analog signal processing, and implement online learning algorithms. Crucially, we prove that computational throughput decouples from energy consumption—a fundamental advantage over silicon.</p>
+            </div>
+            <p>The paper includes:</p>
+            <ul style="color: #8b949e; margin-left: 1.5rem; line-height: 1.8;">
+                <li>Mathematical proofs of energy-computation decoupling</li>
+                <li>18 fully-validated simulation studies</li>
+                <li>Experimental characterization of the $173 prototype device</li>
+                <li>Comparison to biological neural systems and silicon computing</li>
+                <li>Scaling laws and information-theoretic limits</li>
+            </ul>
+            <div class="paper-status">Preparing for submission to arXiv cs.ET</div>
+            <a href="paper/liquid_dynamics_paper.pdf" class="paper-link">Download Full Paper (PDF)</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Ali Ahmed &middot; Liquid Dynamics &middot; <a href="https://github.com/therealbatats/liquid-dynamics" target="_blank">github.com/therealbatats/liquid-dynamics</a></p>
+    </footer>
+
+    <script>
+        // Generate particle animation in hero
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const delay = Math.random() * 3;
+                const duration = 6 + Math.random() * 4;
+
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                particle.style.animationDelay = delay + 's';
+                particle.style.animationDuration = duration + 's';
+
+                container.appendChild(particle);
+            }
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && document.querySelector(href)) {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Active nav link highlighting on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Initialize particles on page load
+        window.addEventListener('load', createParticles);
+    </script>
+</body>
+</html>

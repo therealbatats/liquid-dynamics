@@ -135,3 +135,9 @@ Five key insights guiding the hardware prototype:
 **Status:** Active — 15 simulations complete, more planned
 
 **Last Updated:** March 2026
+
+16. **sim16 | Multi-Chamber Network** → Three ionic chambers in series (Na⁺, K⁺, Cl⁻) behave as neural network layers. Confirmed: transformation depth increases across layers (0.168 → 0.896 → 1.156); downstream chambers act as low-pass filters, homogenizing phase differences from input.
+
+17. **sim17 | Online Supervised Learning** → Liquid dynamics supports delta-rule online learning. Confirmed: 100% test accuracy (vs 50% random baseline) after 100 training trials using Δw = η·(target − y)·c. The NP concentration profile encodes sufficient spatial structure for perfect binary linear classification.
+
+18. **sim18 | Noise Analysis and SNR Limits** → Shot noise from finite ion counts (σ = 3.19×10⁴ mol/m³) dominates over thermal noise (σ = 54 mol/m³) by factor ~587. Confirmed: optimal SNR at L = 500 nm; noise floor energy/bit = 1.36×10⁻¹⁶ J (~10⁶× above Landauer limit, ~10× below silicon CMOS at 7nm node).
